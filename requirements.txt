@@ -1,0 +1,4 @@
+networkx>=3.0
+pandas>=2.0
+tqdm>=4.60
+tabulate>=0.9
