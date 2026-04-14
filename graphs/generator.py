@@ -7,8 +7,10 @@ is a connected, weighted ``nx.Graph`` with integer node labels.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 import random
 
+import matplotlib.pyplot as plt
 import networkx as nx
 
 
@@ -154,3 +156,52 @@ class TopologyGenerator:
             ("scale_free", self.scale_free),
             ("small_world", self.small_world),
         ]
+
+    @staticmethod
+    def save_graph_image(
+        graph: nx.Graph,
+        source: int,
+        target: int,
+        topology: str,
+        graph_id: int,
+        output_dir: str | Path,
+    ) -> Path:
+        """Render a graph snapshot with source/target highlighted."""
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        image_path = output_dir / f"{topology}_graph_{graph_id}.png"
+
+        positions = nx.get_node_attributes(graph, "pos")
+        if not positions:
+            positions = nx.spring_layout(graph, seed=42)
+
+        node_colors = []
+        node_sizes = []
+        for node in graph.nodes():
+            if node == source:
+                node_colors.append("tab:green")
+                node_sizes.append(220)
+            elif node == target:
+                node_colors.append("tab:red")
+                node_sizes.append(220)
+            else:
+                node_colors.append("skyblue")
+                node_sizes.append(90)
+
+        plt.figure(figsize=(10, 8))
+        nx.draw_networkx(
+            graph,
+            pos=positions,
+            with_labels=False,
+            node_color=node_colors,
+            node_size=node_sizes,
+            edge_color="gray",
+            width=0.8,
+            alpha=0.9,
+        )
+        plt.title(f"{topology} graph #{graph_id} | source={source}, target={target}")
+        plt.axis("off")
+        plt.tight_layout()
+        plt.savefig(image_path, dpi=160)
+        plt.close()
+        return image_path

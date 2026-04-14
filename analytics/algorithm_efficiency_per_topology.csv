@@ -1,0 +1,61 @@
+topology,algorithm,time_ms,nodes_visited,edges_relaxed,path_cost,path_hops,success_rate
+bottleneck,A*,0.381,42.69,1335.33,46.76,5.97,1.0
+bottleneck,BFS (unweighted),0.071,54.38,1319.66,80.42,2.97,1.0
+bottleneck,Bellman-Ford,1.685,53.88,8916.56,46.76,5.99,1.0
+bottleneck,Bidirectional Dijkstra,0.458,52.04,1675.32,46.76,5.98,1.0
+bottleneck,Dijkstra,0.392,42.69,1335.33,46.76,5.97,1.0
+bottleneck,Floyd-Warshall,18.698,54.88,165575.18,46.76,6.03,1.0
+dense_mesh,A*,0.476,43.22,1284.01,13.35,3.23,1.0
+dense_mesh,BFS (unweighted),0.072,78.59,1188.25,40.86,1.72,1.0
+dense_mesh,Bellman-Ford,3.1,82.68,13122.44,13.35,3.23,1.0
+dense_mesh,Bidirectional Dijkstra,0.178,11.85,333.51,13.35,3.23,1.0
+dense_mesh,Dijkstra,0.434,43.22,1284.01,13.35,3.23,1.0
+dense_mesh,Floyd-Warshall,85.986,83.68,839606.84,13.35,3.25,1.0
+grid,A*,0.186,62.55,230.28,130.39,8.44,1.0
+grid,BFS (unweighted),0.046,76.35,243.51,188.99,7.48,1.0
+grid,Bellman-Ford,1.401,145.7,8511.86,130.39,8.4,1.0
+grid,Bidirectional Dijkstra,0.104,43.21,161.35,130.39,8.4,1.0
+grid,Dijkstra,0.177,65.6,241.4,130.39,8.44,1.0
+grid,Floyd-Warshall,428.873,146.7,3778668.73,130.39,8.4,1.0
+line,A*,0.159,75.44,148.43,1192.89,46.33,1.0
+line,BFS (unweighted),0.065,76.03,148.49,1192.89,46.33,1.0
+line,Bellman-Ford,5.216,166.19,33535.24,1192.89,46.33,1.0
+line,Bidirectional Dijkstra,0.147,82.33,164.19,1192.89,46.33,1.0
+line,Dijkstra,0.161,75.44,148.43,1192.89,46.33,1.0
+line,Floyd-Warshall,483.991,167.19,3963718.59,1192.89,46.33,1.0
+ring,A*,0.177,78.05,154.1,981.96,38.8,1.0
+ring,BFS (unweighted),0.073,79.06,154.16,982.97,38.8,1.0
+ring,Bellman-Ford,6.481,169.27,35764.8,981.96,38.8,1.0
+ring,Bidirectional Dijkstra,0.149,77.05,154.1,981.96,38.8,1.0
+ring,Dijkstra,0.195,78.05,154.1,981.96,38.8,1.0
+ring,Floyd-Warshall,564.282,170.27,4352600.68,981.96,38.8,1.0
+scale_free,A*,0.334,84.89,677.39,40.06,3.91,1.0
+scale_free,BFS (unweighted),0.066,143.67,697.1,68.86,2.57,1.0
+scale_free,Bellman-Ford,1.271,163.8,6772.62,40.06,3.91,1.0
+scale_free,Bidirectional Dijkstra,0.105,19.95,205.33,40.06,3.91,1.0
+scale_free,Dijkstra,0.333,84.89,677.39,40.06,3.91,1.0
+scale_free,Floyd-Warshall,617.063,164.8,6730933.73,40.06,3.91,1.0
+small_world,A*,0.208,78.06,317.26,81.07,5.05,1.0
+small_world,BFS (unweighted),0.052,109.94,321.16,103.93,4.1,1.0
+small_world,Bellman-Ford,0.993,155.44,5347.68,81.07,5.05,1.0
+small_world,Bidirectional Dijkstra,0.072,24.94,105.61,81.07,5.03,1.0
+small_world,Dijkstra,0.224,78.06,317.26,81.07,5.05,1.0
+small_world,Floyd-Warshall,443.224,156.44,4207970.09,81.07,5.03,1.0
+sparse_random,A*,0.548,77.48,1197.83,22.85,4.24,1.0
+sparse_random,BFS (unweighted),0.095,154.13,1246.01,52.92,2.07,1.0
+sparse_random,Bellman-Ford,3.769,159.77,16142.6,22.85,4.21,1.0
+sparse_random,Bidirectional Dijkstra,0.177,20.18,311.88,22.85,4.21,1.0
+sparse_random,Dijkstra,0.508,77.48,1197.83,22.85,4.24,1.0
+sparse_random,Floyd-Warshall,620.952,160.77,6231785.06,22.85,4.26,1.0
+star,A*,0.224,89.93,257.94,52.04,2.0,1.0
+star,BFS (unweighted),0.057,171.01,262.41,52.04,2.0,1.0
+star,Bellman-Ford,0.307,170.01,1012.18,52.04,2.0,1.0
+star,Bidirectional Dijkstra,0.013,2.0,2.0,52.04,2.0,1.0
+star,Dijkstra,0.28,89.93,257.94,52.04,2.0,1.0
+star,Floyd-Warshall,798.767,171.01,7920964.27,52.04,2.0,1.0
+tree,A*,0.119,54.49,117.3,174.48,6.74,1.0
+tree,BFS (unweighted),0.038,64.72,113.12,174.48,6.74,1.0
+tree,Bellman-Ford,0.297,93.52,1216.52,174.48,6.74,1.0
+tree,Bidirectional Dijkstra,0.052,22.93,52.67,174.48,6.74,1.0
+tree,Dijkstra,0.15,54.49,117.3,174.48,6.74,1.0
+tree,Floyd-Warshall,304.855,94.52,2620938.2,174.48,6.74,1.0

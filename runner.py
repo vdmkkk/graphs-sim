@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 from tqdm import tqdm
 
-from algorithms import AStar, BFS, BellmanFord, BidirectionalDijkstra, Dijkstra
+from algorithms import (
+    AStar,
+    BFS,
+    BellmanFord,
+    BidirectionalDijkstra,
+    Dijkstra,
+    FloydWarshall,
+)
 from graphs.generator import TopologyGenerator
 
 
@@ -20,17 +29,30 @@ class ExperimentRunner:
         Master seed forwarded to :class:`TopologyGenerator`.
     """
 
-    OPTIMAL_ALGOS = {"Dijkstra", "Bellman-Ford", "A*", "Bidirectional Dijkstra"}
+    OPTIMAL_ALGOS = {
+        "Dijkstra",
+        "Bellman-Ford",
+        "A*",
+        "Bidirectional Dijkstra",
+        "Floyd-Warshall",
+    }
 
-    def __init__(self, graphs_per_topology: int = 100, seed: int = 42):
+    def __init__(
+        self,
+        graphs_per_topology: int = 10,
+        seed: int = 42,
+        images_dir: str | Path = "graph_images",
+    ):
         self.graphs_per_topology = graphs_per_topology
         self.generator = TopologyGenerator(seed=seed)
+        self.images_dir = Path(images_dir)
         self.algorithms = [
             Dijkstra(),
             BellmanFord(),
             AStar(),
             BFS(),
             BidirectionalDijkstra(),
+            FloydWarshall(),
         ]
 
     # ------------------------------------------------------------------
@@ -46,6 +68,14 @@ class ExperimentRunner:
             for topo_name, gen_func in topologies:
                 for graph_id in range(self.graphs_per_topology):
                     G, source, target = gen_func()
+                    image_path = self.generator.save_graph_image(
+                        G,
+                        source,
+                        target,
+                        topo_name,
+                        graph_id,
+                        self.images_dir / topo_name,
+                    )
                     for algo in self.algorithms:
                         result = algo.run(G, source, target)
                         records.append(
@@ -56,6 +86,7 @@ class ExperimentRunner:
                                 "num_edges": G.number_of_edges(),
                                 "source": source,
                                 "target": target,
+                                "graph_image": str(image_path),
                                 "algorithm": result.algorithm,
                                 "path_cost": result.path_cost,
                                 "path_hops": result.path_hops,
@@ -71,9 +102,58 @@ class ExperimentRunner:
         self._validate(df)
         return df
 
+    def export_analytics(self, df: pd.DataFrame, output_dir: str | Path) -> None:
+        """Persist the key comparison tables for later analysis."""
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        overall = self._aggregate_by(df, ["algorithm"]).sort_values("time_ms")
+        by_topology = self._aggregate_by(df, ["topology", "algorithm"])
+        by_algorithm = self._aggregate_by(df, ["algorithm", "topology"])
+
+        overall.to_csv(output_dir / "overall_algorithm_efficiency.csv")
+        by_topology.to_csv(output_dir / "algorithm_efficiency_per_topology.csv")
+        by_algorithm.to_csv(output_dir / "algorithm_efficiency_between_topologies.csv")
+
+        df.pivot_table(
+            index="topology",
+            columns="algorithm",
+            values="execution_time_ms",
+            aggfunc="mean",
+        ).round(3).to_csv(output_dir / "execution_time_pivot.csv")
+
+        df.pivot_table(
+            index="topology",
+            columns="algorithm",
+            values="nodes_visited",
+            aggfunc="mean",
+        ).round(1).to_csv(output_dir / "nodes_visited_pivot.csv")
+
+        df.pivot_table(
+            index="topology",
+            columns="algorithm",
+            values="edges_relaxed",
+            aggfunc="mean",
+        ).round(1).to_csv(output_dir / "edges_relaxed_pivot.csv")
+
     # ------------------------------------------------------------------
     # validation
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _aggregate_by(df: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
+        return (
+            df.groupby(keys)
+            .agg(
+                time_ms=("execution_time_ms", "mean"),
+                nodes_visited=("nodes_visited", "mean"),
+                edges_relaxed=("edges_relaxed", "mean"),
+                path_cost=("path_cost", "mean"),
+                path_hops=("path_hops", "mean"),
+                success_rate=("success", "mean"),
+            )
+            .round(3)
+        )
 
     def _validate(self, df: pd.DataFrame) -> None:
         """Verify that all optimal algorithms agree on path cost."""
@@ -112,22 +192,21 @@ class ExperimentRunner:
         print(f"Algorithms          : {n_algos}")
         print(f"Total rows          : {len(df)}")
 
-        # --- per-algorithm averages ---
-        print("\n--- Mean metrics per algorithm (across all topologies) ---\n")
-        agg = (
-            df.groupby("algorithm")
-            .agg(
-                time_ms=("execution_time_ms", "mean"),
-                nodes_visited=("nodes_visited", "mean"),
-                edges_relaxed=("edges_relaxed", "mean"),
-                path_cost=("path_cost", "mean"),
-                path_hops=("path_hops", "mean"),
-            )
-            .round(3)
-        )
-        print(agg.to_string())
+        # --- overall algorithm efficiency ---
+        print("\n--- Overall algorithm efficiency (all topologies combined) ---\n")
+        overall = ExperimentRunner._aggregate_by(df, ["algorithm"])
+        print(overall.sort_values("time_ms").to_string())
 
-        # --- execution time pivot ---
+        # --- compare algorithms within each topology ---
+        print("\n--- Algorithm efficiency for each topology ---\n")
+        topo_algo = ExperimentRunner._aggregate_by(df, ["topology", "algorithm"])
+        print(topo_algo.to_string())
+
+        # --- compare topologies within each algorithm ---
+        print("\n--- Topology efficiency profile for each algorithm ---\n")
+        algo_topo = ExperimentRunner._aggregate_by(df, ["algorithm", "topology"])
+        print(algo_topo.to_string())
+
         print("\n--- Mean execution time (ms) : topology x algorithm ---\n")
         pivot_time = df.pivot_table(
             index="topology",
@@ -137,7 +216,6 @@ class ExperimentRunner:
         ).round(3)
         print(pivot_time.to_string())
 
-        # --- nodes-visited pivot ---
         print("\n--- Mean nodes visited : topology x algorithm ---\n")
         pivot_nv = df.pivot_table(
             index="topology",
@@ -146,6 +224,15 @@ class ExperimentRunner:
             aggfunc="mean",
         ).round(1)
         print(pivot_nv.to_string())
+
+        print("\n--- Mean edges relaxed : topology x algorithm ---\n")
+        pivot_er = df.pivot_table(
+            index="topology",
+            columns="algorithm",
+            values="edges_relaxed",
+            aggfunc="mean",
+        ).round(1)
+        print(pivot_er.to_string())
 
         # --- BFS sub-optimality ---
         bfs = (
