@@ -1,0 +1,7 @@
+algorithm,time_ms,nodes_visited,edges_relaxed,path_cost,path_hops,success_rate
+Bidirectional Dijkstra,0.035,9.898,67.713,0.849,2.583,1.0
+A*,0.039,13.778,91.63,0.849,2.583,1.0
+Dijkstra,0.038,13.778,91.63,0.849,2.583,1.0
+BFS (unweighted),0.014,18.694,91.111,0.87,2.583,1.0
+Bellman-Ford,0.209,24.296,1049.87,0.849,2.583,1.0
+Floyd-Warshall,2.725,40.0,25275.556,0.849,2.583,1.0
