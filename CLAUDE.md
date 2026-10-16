@@ -93,11 +93,9 @@ Remote: `https://github.com/vdmkkk/graphs-sim.git`, ветка `main`.
 
 ### Чек-лист на постоянной машине (следующие шаги)
 
-1. `cd НИР7 && python -m venv .venv && pip install -r requirements.txt`.
-2. Запустить `python -m collector.service` в консоли на минуту, убедиться, что в
-   `data/raw/status.json` растёт `mqtt.saved`, затем поставить постоянный запуск (systemd из
-   `данные.md` или `run_service.sh` / `run_service.bat`). Сервис сразу делает полный снимок
-   ONEmesh (~1 ч) — это и есть данные первой недели.
+1. ✅ venv + зависимости (16.10.2026).
+2. ✅ Живой прогон и постоянный запуск (systemd, 16.10.2026, сбор MQTT с 21:30 UTC). Первый
+   полный снимок ONEmesh — `data/raw/onemesh/full/20261016_2139/` (данные недели 08–16.10).
 3. После снимка — **первичный расчёт Г1–Г6** на неделе 08–16.10 + собранных MQTT-данных:
    код анализа писать в `НИР7/analysis/`, результаты — в `НИР7/results/`.
 4. Подтянуть рельеф (Copernicus DEM GLO-30), здания OSM, справочник железа.
@@ -119,4 +117,13 @@ Remote: `https://github.com/vdmkkk/graphs-sim.git`, ветка `main`.
 - Ноутбук пользователя (Windows): зависимости — в venv
   `C:\Users\VDMK\PycharmProjects\graphs-sim\.venv\Scripts\python.exe` (системный Python 3.12
   без пакетов). Bash-песочница там без сети, сеть — только с флагом `dangerouslyDisableSandbox`.
-- На новой машине — свой venv в `НИР7/.venv` (в `.gitignore`).
+- **Постоянная машина `claude-ws`** (с 16.10.2026): Ubuntu 24.04, Python 3.12, 8 ГБ ОЗУ на всех
+  (VS Code, агенты) — тяжёлые расчёты по одному, Node не больше 3 ГБ heap. Репозиторий —
+  `/home/vdmk/projects/graphs-sim`, venv — `НИР7/.venv` (в `.gitignore`), sudo без пароля.
+  Часовой пояс UTC. Домашняя сеть и хост `salut-homehub` для этого проекта закрыты (политика
+  `/etc/claude-code/CLAUDE.md`); ONEmesh — публичный интернет, можно.
+- **Сборщик НИР7 работает как systemd-сервис `nir7-collector`** (юнит
+  `/etc/systemd/system/nir7-collector.service`, `User=vdmk`, `Restart=always`, автозапуск при
+  загрузке). Лог — `НИР7/data/raw/service.log`, состояние — `НИР7/data/raw/status.json`.
+  `sudo systemctl restart nir7-collector` после правки кода сборщика; второй экземпляр вручную
+  не запускать (не стартует из-за `service.lock`, а для тестов — только с другой папкой данных).

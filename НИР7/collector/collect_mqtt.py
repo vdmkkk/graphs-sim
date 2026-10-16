@@ -11,6 +11,7 @@ hours. Never publishes anything. Reconnects automatically.
 import argparse
 import json
 import os
+import secrets
 import ssl
 import sys
 import threading
@@ -90,7 +91,8 @@ class MqttCollector:
         self.stats = Counter()
         self.last_message_at = None
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
-                                  client_id=f"nir7-research-{int(time.time())}", clean_session=True)
+                                  # A unique id: the broker drops the older of two sessions with the same id.
+                                  client_id=f"nir7-research-{secrets.token_hex(4)}", clean_session=True)
         self.client.username_pw_set(user, password)
         if tls:
             self.client.tls_set(cert_reqs=ssl.CERT_REQUIRED)
@@ -108,6 +110,9 @@ class MqttCollector:
         log("mqtt disconnected", reason_code)
 
     def _on_message(self, client, userdata, msg):
+        if msg.retain:  # stale message the broker replays on every subscribe, not live traffic
+            self.stats["retained"] += 1
+            return
         self.stats["mqtt"] += 1
         self.last_message_at = time.time()
         try:

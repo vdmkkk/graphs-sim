@@ -4,7 +4,8 @@
   position, last telemetry and neighbour lists -> data/raw/onemesh/cache/<ts>/
 * full snapshot (~1 h for Moscow): additionally, per node, the history the map keeps:
   traceroutes with per-hop SNR in both directions, neighbour reports, device metrics,
-  position history -> data/raw/onemesh/full/<ts>/
+  position history -> data/raw/onemesh/full/<ts>/ ; the file DONE marks a finished one.
+  An interrupted full snapshot can be resumed (nodes already saved are skipped).
 
 Polite: one request at a time with a pause between requests.
 
@@ -73,37 +74,64 @@ def _stamp():
     return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
 
 
+def stamp_time(path):
+    """Unix time encoded in a snapshot directory name (YYYYMMDD_HHMM, UTC)."""
+    return datetime.strptime(Path(path).name, "%Y%m%d_%H%M").replace(tzinfo=timezone.utc).timestamp()
+
+
+def latest_snapshot(out_root, kind):
+    """Newest snapshot directory of `kind` ("cache" or "full"), or None."""
+    dirs = sorted(p for p in (Path(out_root) / kind).glob("????????_????") if p.is_dir())
+    return dirs[-1] if dirs else None
+
+
 def snapshot_cache(out_root=DEFAULT_OUT, api=None, topic=TOPIC, cache_name=CACHE_NAME):
     """Node cache + topics + hardware stats. Returns (out_dir, nodes)."""
     api = api or Api()
+    rows = api.get(f"/cache/nodes_{cache_name}_optimized_v2.json")
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError(f"node cache unavailable: {str(rows)[:200]}")
+    nodes = [{k: v for k, v in zip(NODE_COLUMNS, row) if k not in PRIVATE_COLUMNS} for row in rows]
     out = Path(out_root) / "cache" / _stamp()
     out.mkdir(parents=True, exist_ok=True)
     _dump(api.get("/api/v1/topics", show_all="true"), out / "topics.json")
-    rows = api.get(f"/cache/nodes_{cache_name}_optimized_v2.json")
-    nodes = [{k: v for k, v in zip(NODE_COLUMNS, row) if k not in PRIVATE_COLUMNS}
-             for row in rows] if isinstance(rows, list) else []
     _dump(nodes, out / "nodes.json")
     _dump(api.get("/api/v1/stats/hardware-models", root_topic=topic), out / "hardware_models.json")
     return out, nodes
 
 
 def snapshot_full(out_root=DEFAULT_OUT, api=None, topic=TOPIC, cache_name=CACHE_NAME,
-                  max_age_days=30, history_days=30, traceroutes=200, progress=print):
-    """Cache snapshot plus per-node history files. Returns out_dir."""
-    api = api or Api()
-    cache_dir, nodes = snapshot_cache(out_root, api, topic, cache_name)
-    out = Path(out_root) / "full" / cache_dir.name
-    (out / "nodes").mkdir(parents=True, exist_ok=True)
-    for name in ("topics.json", "nodes.json", "hardware_models.json"):
-        (out / name).write_bytes((cache_dir / name).read_bytes())
+                  max_age_days=30, history_days=30, traceroutes=200, progress=print, resume=None,
+                  max_failed_in_row=20):
+    """Cache snapshot plus per-node history files. Returns out_dir.
 
-    now = datetime.now(timezone.utc)
+    resume: an unfinished full/<ts> directory to complete instead of starting a new one.
+    A node whose requests all gave up is not saved (a resumed run retries it); after
+    `max_failed_in_row` such nodes in a row the site is considered down and we raise.
+    """
+    api = api or Api()
+    if resume:
+        out = Path(resume)
+        nodes = json.loads((out / "nodes.json").read_text(encoding="utf-8"))
+        now = datetime.fromtimestamp(stamp_time(out), timezone.utc)
+    else:
+        cache_dir, nodes = snapshot_cache(out_root, api, topic, cache_name)
+        out = Path(out_root) / "full" / cache_dir.name
+        (out / "nodes").mkdir(parents=True, exist_ok=True)
+        for name in ("topics.json", "nodes.json", "hardware_models.json"):
+            (out / name).write_bytes((cache_dir / name).read_bytes())
+        now = datetime.now(timezone.utc)
+
     time_from = int((now.timestamp() - history_days * 86400) * 1000)
     fresh = [n for n in nodes if n["updated_at"] and
              (now - datetime.fromisoformat(n["updated_at"].replace("Z", "+00:00"))).days <= max_age_days]
-    progress(f"full snapshot: {len(fresh)}/{len(nodes)} nodes -> {out}")
+    progress(f"full snapshot{' (resumed)' if resume else ''}: {len(fresh)}/{len(nodes)} nodes -> {out}")
+    saved = failed = in_row = 0
     for i, n in enumerate(fresh, 1):
         nid = n["node_id"]
+        if (out / "nodes" / f"{nid}.json").exists():
+            saved += 1
+            continue
         rec = {
             "node_id": nid,
             "traceroutes": api.get(f"/api/v1/nodes/{nid}/traceroutes", root_topic=topic, count=traceroutes),
@@ -115,11 +143,20 @@ def snapshot_full(out_root=DEFAULT_OUT, api=None, topic=TOPIC, cache_name=CACHE_
         if n["latitude"] is not None:
             rec["position_history"] = api.get(f"/api/v1/nodes/{nid}/position-history", root_topic=topic,
                                               time_from=time_from, time_to=int(now.timestamp() * 1000))
+        if all(isinstance(v, dict) and "_error" in v for k, v in rec.items() if k != "node_id"):
+            failed += 1
+            in_row += 1
+            if in_row >= max_failed_in_row:
+                raise RuntimeError(f"ONEmesh API unavailable: {in_row} nodes in a row failed")
+            continue
+        in_row = 0
         _dump(rec, out / "nodes" / f"{nid}.json")
+        saved += 1
         if i % 100 == 0:
             progress(f"full snapshot: {i}/{len(fresh)}")
-    (out / "DONE").write_text(datetime.now(timezone.utc).isoformat())
-    progress("full snapshot done")
+    _dump({"finished": datetime.now(timezone.utc).isoformat(), "nodes": len(fresh),
+           "saved": saved, "failed": failed}, out / "DONE")
+    progress(f"full snapshot done: {saved}/{len(fresh)} nodes saved, {failed} failed")
     return out
 
 
