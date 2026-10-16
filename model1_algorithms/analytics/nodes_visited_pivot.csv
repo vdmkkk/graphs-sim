@@ -1,6 +1,8 @@
 topology,A*,BFS (unweighted),Bellman-Ford,Bidirectional Dijkstra,Dijkstra,Floyd-Warshall
 bottleneck,46.2,61.0,60.3,53.2,46.2,61.3
 dense_mesh,38.9,77.3,81.3,12.4,38.9,82.3
+dragonfly,48.1,71.7,92.3,16.9,48.1,93.3
+fat_tree,59.4,89.2,112.8,25.6,59.4,113.8
 grid,71.8,80.8,121.2,52.4,74.9,122.2
 line,69.7,70.1,155.5,72.0,69.7,156.5
 ring,86.6,88.1,172.8,86.1,86.6,173.8

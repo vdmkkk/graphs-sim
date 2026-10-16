@@ -139,6 +139,69 @@ class TopologyGenerator:
         G = nx.watts_strogatz_graph(n, k=4, p=0.3, seed=self._next_seed())
         return self._finalise(G)
 
+    def fat_tree(self) -> tuple[nx.Graph, int, int]:
+        """k-ary fat-tree (Clos) — the canonical data-centre topology.
+
+        Three switch tiers (core / aggregation / edge) plus hosts. For pod
+        count ``k`` (even): ``(k/2)**2`` core switches, ``k`` pods each with
+        ``k/2`` aggregation and ``k/2`` edge switches, and ``k/2`` hosts per
+        edge switch. Wiring follows the standard fat-tree (Al-Fares et al.,
+        2008): edge<->aggregation is complete bipartite within a pod, and
+        aggregation switch ``j`` links to the ``j``-th block of core switches.
+        """
+        k = self.rng.choice([4, 6, 8])
+        half = k // 2
+        G = nx.Graph()
+        core = [("core", i) for i in range(half * half)]
+        G.add_nodes_from(core)
+        for pod in range(k):
+            agg = [("agg", pod, i) for i in range(half)]
+            edge = [("edge", pod, i) for i in range(half)]
+            for a in agg:                      # complete bipartite agg<->edge
+                for e in edge:
+                    G.add_edge(a, e)
+            for ei, e in enumerate(edge):      # hosts hang off edge switches
+                for hh in range(half):
+                    G.add_edge(e, ("host", pod, ei, hh))
+            for ai, a in enumerate(agg):       # aggregation <-> core blocks
+                for c in range(half):
+                    G.add_edge(a, core[ai * half + c])
+        return self._finalise(G)
+
+    def dragonfly(self) -> tuple[nx.Graph, int, int]:
+        """Dragonfly topology (Kim et al., 2008): groups of routers.
+
+        Each group's ``a`` routers are fully connected (intra-group); groups
+        form an all-to-all graph via global links (one link per group pair),
+        with ``g = a*h + 1`` groups so every router uses exactly ``h`` global
+        ports. ``p`` hosts hang off each router. Balanced choice ``p = h = a/2``.
+        """
+        a = self.rng.choice([3, 4, 5])
+        h = max(1, a // 2)
+        p = h
+        g = a * h + 1
+        G = nx.Graph()
+
+        def R(grp: int, r: int) -> tuple:
+            return ("r", grp, r)
+
+        for grp in range(g):                   # intra-group clique + hosts
+            routers = [R(grp, r) for r in range(a)]
+            for i in range(a):
+                for j in range(i + 1, a):
+                    G.add_edge(routers[i], routers[j])
+            for r in range(a):
+                for hp in range(p):
+                    G.add_edge(R(grp, r), ("h", grp, r, hp))
+
+        for i in range(g):                     # one global link per group pair
+            targets_i = [x for x in range(g) if x != i]
+            for j in range(i + 1, g):
+                ri = targets_i.index(j) // h
+                rj = [x for x in range(g) if x != j].index(i) // h
+                G.add_edge(R(i, ri), R(j, rj))
+        return self._finalise(G)
+
     # ------------------------------------------------------------------
     # registry
     # ------------------------------------------------------------------
@@ -155,6 +218,8 @@ class TopologyGenerator:
             ("bottleneck", self.bottleneck),
             ("scale_free", self.scale_free),
             ("small_world", self.small_world),
+            ("fat_tree", self.fat_tree),
+            ("dragonfly", self.dragonfly),
         ]
 
     @staticmethod

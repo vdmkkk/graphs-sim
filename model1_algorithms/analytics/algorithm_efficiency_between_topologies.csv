@@ -1,61 +1,73 @@
 algorithm,topology,time_ms,nodes_visited,edges_relaxed,path_cost,path_hops,success_rate
-A*,bottleneck,0.36,46.233,1590.267,39.967,5.9,1.0
-A*,dense_mesh,0.288,38.867,1004.333,14.833,3.533,1.0
-A*,grid,0.176,71.767,262.8,149.667,9.833,1.0
-A*,line,0.101,69.667,136.867,1069.2,41.633,1.0
+A*,bottleneck,0.402,46.233,1590.267,39.967,5.9,1.0
+A*,dense_mesh,0.308,38.867,1004.333,14.833,3.533,1.0
+A*,dragonfly,0.113,48.067,186.333,81.3,4.367,1.0
+A*,fat_tree,0.153,59.4,270.4,74.867,4.933,1.0
+A*,grid,0.175,71.767,262.8,149.667,9.833,1.0
+A*,line,0.104,69.667,136.867,1069.2,41.633,1.0
 A*,ring,0.129,86.567,171.133,1121.567,43.367,1.0
-A*,scale_free,0.278,75.1,615.1,46.133,4.267,1.0
-A*,small_world,0.19,83.5,340.367,83.133,5.433,1.0
-A*,sparse_random,0.367,69.1,1058.4,21.867,3.7,1.0
-A*,star,0.173,85.433,243.3,51.7,2.0,1.0
-A*,tree,0.102,59.7,131.8,197.133,7.433,1.0
-BFS (unweighted),bottleneck,0.07,61.0,1605.067,74.267,2.9,1.0
-BFS (unweighted),dense_mesh,0.058,77.267,1046.667,49.1,1.633,1.0
+A*,scale_free,0.269,75.1,615.1,46.133,4.267,1.0
+A*,small_world,0.193,83.5,340.367,83.133,5.433,1.0
+A*,sparse_random,0.371,69.1,1058.4,21.867,3.7,1.0
+A*,star,0.186,85.433,243.3,51.7,2.0,1.0
+A*,tree,0.109,59.7,131.8,197.133,7.433,1.0
+BFS (unweighted),bottleneck,0.068,61.0,1605.067,74.267,2.9,1.0
+BFS (unweighted),dense_mesh,0.052,77.267,1046.667,49.1,1.633,1.0
+BFS (unweighted),dragonfly,0.031,71.733,181.733,93.267,3.533,1.0
+BFS (unweighted),fat_tree,0.037,89.233,254.9,108.967,4.2,1.0
 BFS (unweighted),grid,0.042,80.833,263.7,223.533,8.967,1.0
-BFS (unweighted),line,0.043,70.067,136.5,1069.2,41.633,1.0
-BFS (unweighted),ring,0.053,88.067,172.133,1122.567,43.3,1.0
-BFS (unweighted),scale_free,0.059,136.567,651.7,70.767,2.733,1.0
-BFS (unweighted),small_world,0.052,124.667,357.167,106.5,4.333,1.0
-BFS (unweighted),sparse_random,0.064,134.233,997.967,53.467,2.033,1.0
+BFS (unweighted),line,0.047,70.067,136.5,1069.2,41.633,1.0
+BFS (unweighted),ring,0.051,88.067,172.133,1122.567,43.3,1.0
+BFS (unweighted),scale_free,0.058,136.567,651.7,70.767,2.733,1.0
+BFS (unweighted),small_world,0.058,124.667,357.167,106.5,4.333,1.0
+BFS (unweighted),sparse_random,0.063,134.233,997.967,53.467,2.033,1.0
 BFS (unweighted),star,0.038,160.867,223.1,51.7,2.0,1.0
 BFS (unweighted),tree,0.034,79.033,135.167,197.133,7.433,1.0
-Bellman-Ford,bottleneck,3.528,60.333,11614.2,39.967,5.767,1.0
-Bellman-Ford,dense_mesh,2.445,81.267,13431.4,14.833,3.533,1.0
-Bellman-Ford,grid,1.157,121.233,7062.133,149.667,9.833,1.0
-Bellman-Ford,line,3.989,155.5,27125.933,1069.2,41.633,1.0
-Bellman-Ford,ring,5.956,172.8,35240.333,1121.567,43.367,1.0
+Bellman-Ford,bottleneck,3.626,60.333,11614.2,39.967,5.767,1.0
+Bellman-Ford,dense_mesh,2.381,81.267,13431.4,14.833,3.533,1.0
+Bellman-Ford,dragonfly,0.379,92.3,1835.2,81.3,4.367,1.0
+Bellman-Ford,fat_tree,0.499,112.767,2522.0,74.867,4.933,1.0
+Bellman-Ford,grid,1.128,121.233,7062.133,149.667,9.833,1.0
+Bellman-Ford,line,3.992,155.5,27125.933,1069.2,41.633,1.0
+Bellman-Ford,ring,5.539,172.8,35240.333,1121.567,43.367,1.0
 Bellman-Ford,scale_free,1.17,142.167,5953.467,46.133,4.267,1.0
-Bellman-Ford,small_world,1.001,150.0,5606.8,83.133,5.4,1.0
-Bellman-Ford,sparse_random,2.493,142.967,14369.933,21.867,3.733,1.0
-Bellman-Ford,star,0.267,159.867,959.2,51.7,2.0,1.0
-Bellman-Ford,tree,0.356,130.8,1744.533,197.133,7.433,1.0
-Bidirectional Dijkstra,bottleneck,0.419,53.167,1860.733,39.967,5.767,1.0
+Bellman-Ford,small_world,1.029,150.0,5606.8,83.133,5.4,1.0
+Bellman-Ford,sparse_random,2.576,142.967,14369.933,21.867,3.733,1.0
+Bellman-Ford,star,0.272,159.867,959.2,51.7,2.0,1.0
+Bellman-Ford,tree,0.35,130.8,1744.533,197.133,7.433,1.0
+Bidirectional Dijkstra,bottleneck,0.431,53.167,1860.733,39.967,5.767,1.0
 Bidirectional Dijkstra,dense_mesh,0.14,12.433,311.633,14.833,3.533,1.0
-Bidirectional Dijkstra,grid,0.113,52.4,193.7,149.667,9.833,1.0
-Bidirectional Dijkstra,line,0.098,71.967,143.467,1069.2,41.633,1.0
-Bidirectional Dijkstra,ring,0.119,86.133,172.267,1121.567,43.367,1.0
-Bidirectional Dijkstra,scale_free,0.103,22.333,213.767,46.133,4.267,1.0
-Bidirectional Dijkstra,small_world,0.075,28.767,120.333,83.133,5.4,1.0
-Bidirectional Dijkstra,sparse_random,0.111,16.567,240.167,21.867,3.7,1.0
+Bidirectional Dijkstra,dragonfly,0.056,16.867,80.0,81.3,4.367,1.0
+Bidirectional Dijkstra,fat_tree,0.085,25.6,141.167,74.867,4.933,1.0
+Bidirectional Dijkstra,grid,0.108,52.4,193.7,149.667,9.833,1.0
+Bidirectional Dijkstra,line,0.099,71.967,143.467,1069.2,41.633,1.0
+Bidirectional Dijkstra,ring,0.116,86.133,172.267,1121.567,43.367,1.0
+Bidirectional Dijkstra,scale_free,0.106,22.333,213.767,46.133,4.267,1.0
+Bidirectional Dijkstra,small_world,0.074,28.767,120.333,83.133,5.4,1.0
+Bidirectional Dijkstra,sparse_random,0.116,16.567,240.167,21.867,3.7,1.0
 Bidirectional Dijkstra,star,0.009,2.0,2.0,51.7,2.0,1.0
-Bidirectional Dijkstra,tree,0.047,25.933,59.8,197.133,7.433,1.0
-Dijkstra,bottleneck,0.368,46.233,1590.267,39.967,5.9,1.0
-Dijkstra,dense_mesh,0.308,38.867,1004.333,14.833,3.533,1.0
-Dijkstra,grid,0.159,74.9,274.2,149.667,9.833,1.0
-Dijkstra,line,0.11,69.667,136.867,1069.2,41.633,1.0
-Dijkstra,ring,0.145,86.567,171.133,1121.567,43.367,1.0
-Dijkstra,scale_free,0.265,75.1,615.1,46.133,4.267,1.0
-Dijkstra,small_world,0.197,83.5,340.367,83.133,5.433,1.0
-Dijkstra,sparse_random,0.371,69.1,1058.4,21.867,3.7,1.0
-Dijkstra,star,0.181,85.433,243.3,51.7,2.0,1.0
-Dijkstra,tree,0.115,59.7,131.8,197.133,7.433,1.0
-Floyd-Warshall,bottleneck,18.909,61.333,204561.933,39.967,5.833,1.0
-Floyd-Warshall,dense_mesh,65.775,82.267,799095.633,14.833,3.533,1.0
-Floyd-Warshall,grid,194.38,122.233,2196457.6,149.667,9.833,1.0
-Floyd-Warshall,line,312.114,156.5,3539050.2,1069.2,41.633,1.0
-Floyd-Warshall,ring,362.45,173.8,4052928.3,1121.567,43.367,1.0
-Floyd-Warshall,scale_free,495.866,143.167,6294657.867,46.133,4.3,1.0
-Floyd-Warshall,small_world,342.301,151.0,3965127.3,83.133,5.433,1.0
-Floyd-Warshall,sparse_random,417.597,143.967,5257823.233,21.867,3.733,1.0
-Floyd-Warshall,star,542.959,160.867,7190982.867,51.7,2.0,1.0
-Floyd-Warshall,tree,360.708,131.8,4291000.2,197.133,7.433,1.0
+Bidirectional Dijkstra,tree,0.048,25.933,59.8,197.133,7.433,1.0
+Dijkstra,bottleneck,0.4,46.233,1590.267,39.967,5.9,1.0
+Dijkstra,dense_mesh,0.305,38.867,1004.333,14.833,3.533,1.0
+Dijkstra,dragonfly,0.126,48.067,186.333,81.3,4.367,1.0
+Dijkstra,fat_tree,0.163,59.4,270.4,74.867,4.933,1.0
+Dijkstra,grid,0.158,74.9,274.2,149.667,9.833,1.0
+Dijkstra,line,0.104,69.667,136.867,1069.2,41.633,1.0
+Dijkstra,ring,0.127,86.567,171.133,1121.567,43.367,1.0
+Dijkstra,scale_free,0.261,75.1,615.1,46.133,4.267,1.0
+Dijkstra,small_world,0.202,83.5,340.367,83.133,5.433,1.0
+Dijkstra,sparse_random,0.375,69.1,1058.4,21.867,3.7,1.0
+Dijkstra,star,0.175,85.433,243.3,51.7,2.0,1.0
+Dijkstra,tree,0.112,59.7,131.8,197.133,7.433,1.0
+Floyd-Warshall,bottleneck,18.939,61.333,204561.933,39.967,5.833,1.0
+Floyd-Warshall,dense_mesh,65.13,82.267,799095.633,14.833,3.533,1.0
+Floyd-Warshall,dragonfly,82.438,93.3,971212.1,81.3,4.367,1.0
+Floyd-Warshall,fat_tree,181.214,113.767,2144864.767,74.867,4.933,1.0
+Floyd-Warshall,grid,190.233,122.233,2196457.6,149.667,9.833,1.0
+Floyd-Warshall,line,301.326,156.5,3539050.2,1069.2,41.633,1.0
+Floyd-Warshall,ring,348.263,173.8,4052928.3,1121.567,43.367,1.0
+Floyd-Warshall,scale_free,486.307,143.167,6294657.867,46.133,4.3,1.0
+Floyd-Warshall,small_world,341.457,151.0,3965127.3,83.133,5.433,1.0
+Floyd-Warshall,sparse_random,411.913,143.967,5257823.233,21.867,3.733,1.0
+Floyd-Warshall,star,529.85,160.867,7190982.867,51.7,2.0,1.0
+Floyd-Warshall,tree,347.699,131.8,4291000.2,197.133,7.433,1.0

@@ -227,7 +227,83 @@ class ExperimentRunner:
         heatmap("edges_relaxed", "m1_heatmap_edges.png",
                 "Среднее число релаксаций рёбер: алгоритм × топология",
                 "log10(рёбер)", log=True)
+        self.render_fat_tree_example(plots_dir / "fat_tree_example.png")
         tqdm.write(f"Model 1 plots written to {plots_dir}/")
+
+    @staticmethod
+    def render_fat_tree_example(path: str | Path, k: int = 4) -> None:
+        """Clean layered render of a k-ary fat-tree for the report (Figure 1).
+
+        Independent of the experiment RNG and deliberately small (k=4) for
+        readability; uses an explicit core/aggregation/edge/host layout rather
+        than a force-directed one so the Clos structure is legible.
+        """
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+            import networkx as nx
+        except Exception:  # pragma: no cover
+            return
+
+        half = k // 2
+        G = nx.Graph()
+        pos: dict = {}
+        core = [("core", i) for i in range(half * half)]
+        span = k * 4
+        for i, c in enumerate(core):
+            G.add_node(c)
+            pos[c] = ((i + 0.5) * span / len(core), 6)
+        for p in range(k):
+            base = p * 4
+            agg = [("agg", p, i) for i in range(half)]
+            edge = [("edge", p, i) for i in range(half)]
+            for i, a in enumerate(agg):
+                pos[a] = (base + 1 + 2 * i, 4)
+            for i, e in enumerate(edge):
+                pos[e] = (base + 1 + 2 * i, 2.5)
+            for a in agg:
+                for e in edge:
+                    G.add_edge(a, e)
+            for ei, e in enumerate(edge):
+                for hh in range(half):
+                    host = ("host", p, ei, hh)
+                    G.add_edge(e, host)
+                    pos[host] = (base + 0.4 + 2 * ei + 1.2 * hh, 1)
+            for ai, a in enumerate(agg):
+                for c in range(half):
+                    G.add_edge(a, core[ai * half + c])
+
+        source = ("host", 0, 0, 0)
+        target = ("host", k - 1, half - 1, half - 1)
+        colors, sizes = [], []
+        for node in G.nodes():
+            if node == source:
+                colors.append("tab:green"); sizes.append(260)
+            elif node == target:
+                colors.append("tab:red"); sizes.append(260)
+            elif node[0] == "core":
+                colors.append("#d98c3f"); sizes.append(200)
+            elif node[0] == "agg":
+                colors.append("#3b6fb5"); sizes.append(180)
+            elif node[0] == "edge":
+                colors.append("#5aa469"); sizes.append(160)
+            else:
+                colors.append("skyblue"); sizes.append(90)
+
+        fig = plt.figure(figsize=(10, 8))
+        nx.draw_networkx(G, pos=pos, with_labels=False, node_color=colors,
+                         node_size=sizes, edge_color="gray", width=0.9, alpha=0.9)
+        for y, label in ((6, "ядро (core)"), (4, "агрегация (aggregation)"),
+                         (2.5, "доступ (edge)"), (1, "хосты (hosts)")):
+            plt.text(-0.6, y, label, ha="right", va="center", fontsize=9,
+                     color="#444444")
+        plt.title(f"Топология fat-tree (k={k}): источник — зелёный, получатель — красный")
+        plt.axis("off")
+        plt.xlim(-4.5, span + 0.5)
+        plt.tight_layout()
+        plt.savefig(path, dpi=160)
+        plt.close(fig)
 
     # ------------------------------------------------------------------
     # validation
