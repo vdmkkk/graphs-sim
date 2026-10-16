@@ -13,7 +13,7 @@ from docx.enum.section import WD_SECTION
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
-ROOT = "c:/Users/VDMK/projects/graphs-sim"
+ROOT = os.path.dirname(os.path.abspath(__file__)).replace("\\", "/")
 M1PLOTS = f"{ROOT}/model1_algorithms/plots"
 M1IMG = f"{ROOT}/model1_algorithms/graph_images"
 M2RES = f"{ROOT}/model2_protocols/results"

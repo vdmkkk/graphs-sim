@@ -1,0 +1,10 @@
+paho-mqtt>=2.1
+meshtastic>=2.7      # official protobuf definitions (ServiceEnvelope, MeshPacket, ...)
+cryptography>=42     # AES-CTR decryption of default-channel packets
+requests>=2.31
+numpy>=2.0
+pandas>=2.0
+scipy>=1.13
+statsmodels>=0.14
+matplotlib>=3.8
+networkx>=3.0
